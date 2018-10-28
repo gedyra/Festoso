@@ -8,10 +8,6 @@
 
 session_start();
 
-foreach ($_SESSION as $data) {
-    print_r($data);
-}
-
 if (isset($_SESSION)) {
     $_SESSION = array();
 
