@@ -23,7 +23,6 @@ if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
         $pdo = connect();
 
         $stmt = $pdo->prepare('SELECT * FROM User WHERE user_name = ?');
-        $params = array();
         $params[] = $user_name;
 
         $stmt->execute($params);
@@ -42,7 +41,8 @@ if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
             if ($password_true === $password) {
                 session_regenerate_id(true);
                 $_SESSION['login_user'] = $row;
-                header('Location:profile.php');
+                $login_user = $_SESSION['login_user'];
+                header("Location:profile.php?id=" . $login_user['id']);
                 return;
             }
         }
