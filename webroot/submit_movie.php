@@ -90,7 +90,7 @@ try {
     ?>
 
 <?php else: ?>
-    ログインしてください
+    <a href="login.php">ログインしてください</a>
 <?php endif; ?>
 </body>
 </html>
