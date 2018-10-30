@@ -76,7 +76,7 @@ if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
         </p>
         <p>
             <label for="">パスワード</label>
-            <input type="text" name="password" id="password">
+            <input type="password" name="password" id="password">
             <?php if (isset($err['password'])) : ?>
         <p class="error"><?php echo h($err['password']); ?></p>
     <?php endif; ?>

@@ -36,7 +36,7 @@ if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
 
     if (count($err) === 0) {
         $pdo = connect();
-        $stmt = $pdo->prepare('INSERT INTO `User` (`id`, `user_name`, `password`, `group_name`) VALUES (null, ?, ?, ?)');
+        $stmt = $pdo->prepare('INSERT INTO User (id, user_name, password, group_name) VALUES (null, ?, ?, ?)');
 
         $params = array();
         $params[] = $user_name;

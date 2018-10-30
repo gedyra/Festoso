@@ -20,28 +20,32 @@ if (isset($_SESSION)) {
     $login_user = $_SESSION['login_user'];
     $state_login = true;
     $pdo = connect();
-    $stmt = $pdo->prepare('SELECT FROM User WHERE id=?');
+    $stmt = $pdo->prepare('SELECT * FROM User WHERE id=?');
     $param[] = $login_user['id'];
     $stmt->execute($param);
     $results = $stmt->fetch(PDO::FETCH_ASSOC);
 
     $group_name_origin = $results['group_name'];
-    $base_origin = $results['base_origin'];
+    $base_origin = $results['base'];
     $homepage_origin = $results['homepage'];
 }
 
 if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
-    $group_name = filter_input(INPUT_POST, 'user_name');
+    $group_name = filter_input(INPUT_POST, 'group_name');
     $base = filter_input(INPUT_POST, "base");
     $homepage = filter_input(INPUT_POST, 'homepage');
 
-    $flags = array(
-        $group_name => false,
-        $base => false,
-        $homepage => false
-    );
+    $sql = 'UPDATE User SET group_name=?, base=?, homepage=? WHERE User.id=?';
+    $stmt = $pdo->prepare($sql);
 
+    $params[] = $group_name;
+    $params[] = $base;
+    $params[] = $homepage;
+    $params[] = $login_user['id'];
 
+    $stmt->execute($params);
+
+    header('Location:profile.php?id=' . $login_user['id']);
 }
 
 
@@ -65,17 +69,18 @@ if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
 <?php else: ?>
     <form action="" method="post">
         <p>
-            <label for="group_name">団体名</label>
-            <input type="text" id="group_name" name="group_name">
+            <label for="group_name">団体名</label><br>
+            <input type="text" id="group_name" name="group_name" value="<?php echo $group_name_origin ?>">
         </p>
         <p>
-            <label for="base">団体拠点</label>
-            <input type="text" id="base" name="base">
+            <label for="base">団体拠点</label><br>
+            <input type="text" id="base" name="base" value="<?php echo $base_origin ?>">
         </p>
         <p>
-            <label for="homepage">ホームページ</label>
-            <input type="text" id="homepage" name="homepage">
+            <label for="homepage">SNS等アドレス</label><br>
+            <input type="text" id="homepage" name="homepage" value="<?php echo $homepage_origin ?>">
         </p>
+        <input type="submit" value="登録">
 
     </form>
 
