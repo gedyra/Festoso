@@ -16,7 +16,7 @@ require "$root/mission6/database.php";
 
 $state_login = false;
 
-if (isset($_SESSION)) {
+if (isset($_SESSION['login_user'])) {
     $login_user = $_SESSION['login_user'];
     $state_login = true;
     $pdo = connect();
@@ -63,9 +63,7 @@ if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
 <body>
 
 <?php if ($state_login === false): ?>
-    リダイレクトします
     <?php header('Location:login.php'); ?>
-
 <?php else: ?>
     <form action="" method="post">
         <p>
