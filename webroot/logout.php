@@ -27,9 +27,10 @@ if (isset($_SESSION)) {
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Festoso</title>
+    <meta http-equiv="Refresh" content="3, index.php">
 </head>
 <body>
-ログアウトしました。
-<a href="index.php">トップページはこちら</a>
+ログアウトしました。<br>
+<a href="index.php">リダイレクトされない場合はこちらをクリック</a>
 </body>
 </html>
