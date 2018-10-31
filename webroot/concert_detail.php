@@ -14,6 +14,8 @@ session_start();
 $root = realpath($_SERVER["DOCUMENT_ROOT"]);
 require "$root/mission6/database.php";
 
+$login_user = $_SESSION['login_user'];
+
 // GETメソッドのクエリから、表示したい演奏会のIDを取得
 if (isset($_GET['id'])) {
     $object_concert_id = h($_GET['id']);
