@@ -9,13 +9,13 @@ require "$root/mission6/database.php";
 
 $state_login = false;
 
-if (isset($_SESSION)) {
+if (isset($_SESSION['login_user'])) {
     $login_user = $_SESSION['login_user'];
     $state_login = true;
-    $pdo = connect();
 }
 
 $target = $_GET;
+$pdo = connect();
 
 ?>
 
@@ -30,9 +30,6 @@ $target = $_GET;
     <script src="main.js"></script>
 </head>
 <body>
-<?php if ($state_login === true and $login_user['id'] === $target['id']) : ?>
-    <a href="edit_profile.php?id=<?php echo $login_user['id'] ?>">プロフィール編集</a>
-<?php endif; ?>
 <h2>プロフィール</h2>
 <h3>基本情報</h3>
 <?php
@@ -47,6 +44,11 @@ $results_user = $stmt->fetch(PDO::FETCH_ASSOC);
 拠点: <?php if ($results_user['base'] === ''): ?> まだ登録されていません <?php else: ?><?php echo $results_user['base']; ?><?php endif; ?>
 <br>
 SNS等リンク: <?php if ($results_user['homepage'] === ''): ?> まだ登録されていません <?php else: ?><?php echo $results_user['homepage']; ?><?php endif; ?>
+<br>
+<?php if ($state_login === true and $login_user['id'] === $target['id']) : ?>
+    <a href="edit_profile.php">プロフィール編集</a>
+<?php endif; ?>
+
 <h3>演奏会一覧</h3>
 
 <?php
@@ -71,7 +73,7 @@ $results_movie = $stmt->fetchAll();
         </tr>
         <?php foreach ($results_concert as $row): ?>
             <tr>
-                <td><?php echo $row['concert_title']; ?> </td>
+                <td><?php echo $row['title']; ?> </td>
                 <td>
                     <a href="concert_detail.php?id=<?php echo $row['concert_id']; ?>">concert_detail.php?id=<?php echo $row['concert_id']; ?></a>
                 </td>
@@ -103,8 +105,7 @@ $results_movie = $stmt->fetchAll();
     </table>
     </p>
 <?php else: ?>
-    演奏会はまだ登録されていません
-
+    動画はまだ登録されていません
 <?php endif; ?>
 </body>
 </html>
