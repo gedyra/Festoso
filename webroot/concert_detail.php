@@ -49,10 +49,17 @@ if (isset($_GET['id'])) {
     <title>演奏会詳細</title>
 </head>
 <body>
+<?php if (count($concert_info) > 0): ?>
 <h2>演奏会詳細</h2>
-演奏会名 <?php echo $concert_info['concert_title'] ?> <br>
+    演奏会名 <?php echo $concert_info['title'] ?> <br>
 主催者 <?php echo $group_info['group_name'] ?> <br>
-日時 <?php echo $concert_info['concert_date'] ?> <br>
-場所 <?php echo $concert_info['concert_place'] ?> <br>
+    日時 <?php echo $concert_info['date'] ?> <br>
+    場所 <?php echo $concert_info['place'] ?> <br>
+
+    <a href="edit_concert.php?id=<? echo $object_concert_id ?>">編集</a>
+<?php else: ?>
+    <?php header("HTTP/1.0 404 Not Found"); ?>
+<?php endif; ?>
+
 </body>
 </html>

@@ -30,11 +30,12 @@ $result_movie = $stmt->fetchAll();
     <script src="main.js"></script>
 </head>
 <body>
-<h1>Good Players</h1>
+<h1>Festoso</h1>
 
 <?php if (isset($login_user)) : ?>
-    <a href="profile.php">マイページ</a>
-    <a href="logout.php">ログアウト</a>
+    ようこそ、<?php echo $login_user['id']; ?>さん<br>
+    <a href="profile.php?id=<? echo $login_user['id']; ?>">マイページ</a> <a href="submit_concert.php">演奏会登録</a>
+    <a href="logout.php" onclick="return confirm('ログアウトします。よろしいですか？')">ログアウト</a>
 <?php else : ?>
     <a href="login.php">ログイン</a>
 <?php endif; ?>
@@ -42,7 +43,7 @@ $result_movie = $stmt->fetchAll();
 <h2>最近追加された演奏会</h2>
 <p>
     <?php foreach ($result_concert as $row): ?>
-        <?php echo $row['concert_title']; ?> : <a href="concert_detail.php?id=<?php echo $row['concert_id']; ?>">concert_detail.php?id=<?php echo $row['concert_id']; ?></a>
+        <?php echo $row['title']; ?> : <a href="concert_detail.php?id=<?php echo $row['concert_id']; ?>">concert_detail.php?id=<?php echo $row['concert_id']; ?></a>
         <br>
     <?php endforeach; ?>
 </p>

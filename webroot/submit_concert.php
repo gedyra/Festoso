@@ -16,12 +16,12 @@ require "$root/mission6/database.php";
 
 $login_user = $_SESSION['login_user'];
 
-function upload()
-{
-    global $root;
-    move_uploaded_file($_FILES['image']['tmp_name'],
-        "$root/mission6/images");
-}
+//function upload()
+//{
+//    global $root;
+//    move_uploaded_file($_FILES['image']['tmp_name'],
+//        "$root/mission6/images");
+//}
 
 date_default_timezone_set('Asia/Tokyo');
 $today = date("Y-m-d");
@@ -39,7 +39,8 @@ if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
 
     if (count($err) === 0) {
         $pdo = connect();
-        $stmt = $pdo->prepare('INSERT INTO `Concert` (`concert_id`, `user_id`, `concert_title`, `concert_cast`, `concert_place`, `concert_date`) VALUES (null, ?, ?, ?, ?, ?)');
+        $stmt = $pdo->prepare('INSERT INTO `Concert` (`concert_id`, `user_id`, `concert_title`, `concert_cast`, `concert_place`, `concert_date`)'
+            . ' VALUES (null, ?, ?, ?, ?, ?)');
 
         $params = array();
         $params[] = $login_user['id'];
@@ -51,6 +52,7 @@ if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
 
         $success = $stmt->execute($params);
 
+        $concert_id = $pdo->lastInsertId('concert_id');
     }
 }
 ?>
@@ -67,8 +69,8 @@ if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
 <body>
 <h2>演奏会登録</h2>
 <?php if (isset($success) && $success) : ?>
-    <p>登録に成功しました。</p>
-    <p><a href="concert_detail.php?id=<?php $concert_id ?>">演奏会詳細ページはこちら</a></p>
+    <?php header('Location:concert_detail.php?id=' . $concert_id); ?>
+    <!--    <p><a href="concert_detail.php?id=--><?php //$concert_id ?><!--">演奏会詳細ページはこちら</a></p>-->
 <?php else: ?>
     <form action="" method="post" enctype="multipart/form-data">
         <p>
