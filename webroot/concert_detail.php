@@ -22,23 +22,36 @@ if (isset($_GET['id'])) {
 
     $pdo = connect();
 
+    // 指定されたidの演奏会が存在するかどうかを調べる
     $stmt = $pdo->prepare(
-        'SELECT * FROM Concert WHERE concert_id=?'
+        'SELECT COUNT(*) AS num_of_concert FROM Concert WHERE concert_id=:id'
     );
-    $params[] = $object_concert_id;
-    $stmt->execute($params);
+    $stmt->bindParam(':id', $object_concert_id);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $concert_info = $stmt->fetch(PDO::FETCH_ASSOC);
+    // 演奏会が存在した場合
+    if ($result['num_of_concert'] > 0) {
+        // 指定された演奏会idの演奏会情報情報を取得
+        $stmt = $pdo->prepare(
+            'SELECT * FROM Concert WHERE concert_id=?'
+        );
+        $params[] = $object_concert_id;
+        $stmt->execute($params);
 
-    $stmt = $pdo->prepare(
-        'SELECT group_name FROM User WHERE id=?'
-    );
-    $user_id[] = $concert_info['user_id'];
-    $stmt->execute($user_id);
+        $concert_info = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $group_info = $stmt->fetch(PDO::FETCH_ASSOC);
+        // 演奏会を主催するユーザの団体名を取得
+        $stmt = $pdo->prepare(
+            'SELECT group_name FROM User WHERE id=?'
+        );
+        $user_id[] = $concert_info['user_id'];
+        $stmt->execute($user_id);
+
+        $group_info = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    }
 }
-
 ?>
 
 <!doctype html>
@@ -51,16 +64,20 @@ if (isset($_GET['id'])) {
     <title>演奏会詳細</title>
 </head>
 <body>
-<?php if (count($concert_info) > 0): ?>
-<h2>演奏会詳細</h2>
+<?php if ($result["num_of_concert"] > 0): ?>
+    <h2>演奏会詳細</h2>
     演奏会名 <?php echo $concert_info['title'] ?> <br>
-主催者 <?php echo $group_info['group_name'] ?> <br>
+    主催者 <?php echo $group_info['group_name'] ?> <br>
     日時 <?php echo $concert_info['date'] ?> <br>
     場所 <?php echo $concert_info['place'] ?> <br>
 
-    <a href="edit_concert.php?id=<? echo $object_concert_id ?>">編集</a>
+    <!--    ログインしているユーザが演奏会主催者ならば、編集リンクを表示-->
+    <?php if ($login_user['id'] === $concert_info['user_id']): ?>
+        <a href="edit_concert.php?id=<? echo $object_concert_id ?>">編集</a>
+    <? endif; ?>
 <?php else: ?>
-    <?php header("HTTP/1.0 404 Not Found"); ?>
+    指定された演奏会は存在しません。<br>
+    <a href="index.php">トップページに戻る</a>
 <?php endif; ?>
 
 </body>

@@ -60,13 +60,18 @@ if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
     <title>演奏会情報編集 | Festoso</title>
 </head>
 <body>
-<h1>
-    演奏会情報編集
-</h1>
-
+<!--ログインしてない場合-->
 <?php if ($state_login === false): ?>
     <?php header('Location:login.php'); ?>
+    <!--第三者のユーザが表示した場合-->
+<?php elseif ($login_user['id'] !== $element_original['user_id']): ?>
+    403 Forbidden <br>
+    他のユーザの演奏会は編集できません…<br>
+    <a href="index.php">トップページに戻る</a>
 <?php else: ?>
+    <h1>
+        演奏会情報編集
+    </h1>
     <form action="" method="post">
         <p>
             <label for="title">演奏会名</label><br>
