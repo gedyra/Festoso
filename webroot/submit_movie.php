@@ -24,8 +24,8 @@ if (isset($_SESSION['login_user'])) {
 $pdo = connect();
 
 try {
-    if (isset($_FILES['upfile']['error']) && is_int($_FILES['upfile']['error'])) {
-        switch ($_FILES['upfile']['error']) {
+    if (isset($_FILES['movie']['error']) && is_int($_FILES['upfile']['error'])) {
+        switch ($_FILES['movie']['error']) {
             case UPLOAD_ERR_OK:
                 break;
             case UPLOAD_ERR_NO_FILE:
@@ -55,6 +55,7 @@ try {
         $params[] = $login_user['id'];
         $stmt->execute($params);
     }
+    header('Location:profile.php?id=' . $login_user['id']);
 } catch (PDOException $e) {
     exit($e->getMessage());
 }
@@ -72,25 +73,11 @@ try {
 <body>
 <?php if ($state_login !== false): ?>
     <form action="submit_movie.php" enctype="multipart/form-data" method="post">
-        <input type="file" name="upfile">
+        <input type="file" name="movie">
         <input type="submit" value="アップロード">
     </form>
-    <?php
-    $sql = 'SELECT title,title_hash FROM movie ORDER BY id';
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute();
-
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        echo($row["title"] . '<br>');
-        $target = $row["title_hash"];
-        echo("$target");
-        echo("<video src=\"import_media.php?target=$target\" width=\"426\" height=\"240\" controls></video>");
-        echo('<br><br>');
-    }
-    ?>
-
 <?php else: ?>
-    <a href="login.php">ログインしてください</a>
+    <?php header('Location:login.php'); ?>
 <?php endif; ?>
 </body>
 </html>

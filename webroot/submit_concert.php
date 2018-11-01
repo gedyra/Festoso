@@ -16,12 +16,12 @@ require "$root/mission6/database.php";
 
 $login_user = $_SESSION['login_user'];
 
-//function upload()
-//{
-//    global $root;
-//    move_uploaded_file($_FILES['image']['tmp_name'],
-//        "$root/mission6/images");
-//}
+function upload()
+{
+    global $root;
+    move_uploaded_file($_FILES['image']['tmp_name'],
+        "$root/mission6/images");
+}
 
 date_default_timezone_set('Asia/Tokyo');
 $today = date("Y-m-d");
@@ -70,7 +70,6 @@ if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
 <h2>演奏会登録</h2>
 <?php if (isset($success) && $success) : ?>
     <?php header('Location:concert_detail.php?id=' . $concert_id); ?>
-    <!--    <p><a href="concert_detail.php?id=--><?php //$concert_id ?><!--">演奏会詳細ページはこちら</a></p>-->
 <?php else: ?>
     <form action="" method="post" enctype="multipart/form-data">
         <p>
@@ -89,16 +88,12 @@ if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
             <label for="place">場所</label>
             <input type="text" id="place" name="concert_place">
         </p>
-
+        <p>
+            <label for="poster">ポスターなどの画像</label><br>
+            <input type="file" id="poster" name="image" accept="image/*">
+        </p>
         <p>
             <button type="submit">新規登録</button>
-        </p>
-    </form>
-
-    <form action="" method="post" enctype="multipart/form-data">
-        <p>
-            <label for="poster">ポスターなどの画像</label>
-            <input type="file" id="poster" name="image">
         </p>
     </form>
 
