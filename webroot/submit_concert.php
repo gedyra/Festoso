@@ -19,8 +19,11 @@ $login_user = $_SESSION['login_user'];
 function upload()
 {
     global $root;
-    move_uploaded_file($_FILES['image']['tmp_name'],
-        "$root/mission6/images");
+    $tmp_name = $_FILES['image']['tmp_name'];
+    $name = basename($_FILES['image']['name']);
+    $name = mb_convert_encoding($name, "SJIS", "AUTO");
+    move_uploaded_file($tmp_name,
+        "$root/mission6/images/$name");
 }
 
 date_default_timezone_set('Asia/Tokyo');
@@ -53,6 +56,10 @@ if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
         $success = $stmt->execute($params);
 
         $concert_id = $pdo->lastInsertId('concert_id');
+
+
+        $stmt->bindParam(':user_id', $login_user['id']);
+        $stmt->bindParam(':concert_id', $concert_id);
     }
 }
 ?>
@@ -89,7 +96,7 @@ if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
             <input type="text" id="place" name="concert_place">
         </p>
         <p>
-            <label for="poster">ポスターなどの画像</label><br>
+            <label for="poster">画像</label><br>
             <input type="file" id="poster" name="image" accept="image/*">
         </p>
         <p>

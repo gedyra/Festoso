@@ -24,7 +24,7 @@ if (isset($_SESSION['login_user'])) {
 $pdo = connect();
 
 try {
-    if (isset($_FILES['movie']['error']) && is_int($_FILES['upfile']['error'])) {
+    if (isset($_FILES['movie']['error']) && is_int($_FILES['movie']['error'])) {
         switch ($_FILES['movie']['error']) {
             case UPLOAD_ERR_OK:
                 break;
