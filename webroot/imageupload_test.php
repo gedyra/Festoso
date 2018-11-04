@@ -14,7 +14,6 @@ session_start();
 $root = realpath($_SERVER["DOCUMENT_ROOT"]);
 require "$root/mission6/database.php";
 
-$login_user = $_SESSION['login_user'];
 
 function upload()
 {
@@ -33,30 +32,36 @@ function upload()
     $tmp_name = $_FILES['image']['tmp_name'];
     $bname = basename($_FILES['image']['name']);
     $name = mb_convert_encoding($bname, "UTF-8", "AUTO");
-    $path = "$root/mission6/images/$name";
+    $path = "../images/$name";
     move_uploaded_file($tmp_name, $path);
 
     return array('name' => $name, 'path' => $path);
 }
 
-$image_info = upload();
-
 if (isset($_SESSION['login_user'])) {
-    $pdo = connect();
+    if (isset($_FILES['image'])) {
+        $image_info = upload();
 
-    $sql = 'INSERT INTO Picture(id, title, path, user_id, concert_id)'
-        . ' VALUES (null, :picture_title, :picture_path, :user_id, :concert_id)';
-    $stmt = $pdo->prepare($sql);
+        $login_user = $_SESSION['login_user'];
 
-    echo $image_info['name'];
-    $stmt->bindParam(':picture_title', $image_info['name'], PDO::PARAM_STR);
-    $stmt->bindParam(':picture_path', $image_info['path'], PDO::PARAM_STR);
-    $stmt->bindParam(':user_id', $login_user['id'], PDO::PARAM_INT);
-    $stmt->bindValue(':concert_id', 1, PDO::PARAM_INT);
+        $pdo = connect();
 
-    $stmt->execute();
+        $sql = 'INSERT INTO Picture(id, title, path, user_id, concert_id)'
+            . ' VALUES (null, :picture_title, :picture_path, :user_id, :concert_id)';
+        $stmt = $pdo->prepare($sql);
+
+        echo $image_info['name'];
+        $stmt->bindParam(':picture_title', $image_info['name'], PDO::PARAM_STR);
+        $stmt->bindParam(':picture_path', $image_info['path'], PDO::PARAM_STR);
+        $stmt->bindParam(':user_id', $login_user['id'], PDO::PARAM_INT);
+        $stmt->bindValue(':concert_id', 1, PDO::PARAM_INT);
+
+        $stmt->execute();
+
+    }
+} else {
+    header('Location:login.php');
 }
-
 
 ?>
 
