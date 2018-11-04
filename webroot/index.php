@@ -56,5 +56,8 @@ $result_movie = $stmt->fetchAll();
     <?php endforeach; ?>
 </p>
 
+<a href="imageupload_test.php">画像投稿テストページ</a>
+<a href="imageview_test.php">画像表示テストページ</a>
+
 </body>
 </html>
