@@ -75,7 +75,7 @@ $results_movie = $stmt->fetchAll();
             <tr>
                 <td><?php echo $row['title']; ?> </td>
                 <td>
-                    <a href="concert_detail.php?id=<?php echo $row['concert_id']; ?>">concert_detail.php?id=<?php echo $row['concert_id']; ?></a>
+                    <a href="concert_detail.php?id=<?php echo $row['id']; ?>">concert_detail.php?id=<?php echo $row['id']; ?></a>
                 </td>
             </tr>
         <?php endforeach; ?>

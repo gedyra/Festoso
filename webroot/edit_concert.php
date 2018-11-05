@@ -23,7 +23,7 @@ if (isset($_SESSION['login_user'])) {
     $state_login = true;
 
     $pdo = connect();
-    $stmt = $pdo->prepare('SELECT * FROM Concert WHERE concert_id=?');
+    $stmt = $pdo->prepare('SELECT * FROM Concert WHERE Concert.id=?');
     $param[] = $target['id'];
     $stmt->execute($param);
     $element_original = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -34,7 +34,7 @@ if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
     $date = filter_input(INPUT_POST, 'date');
     $place = filter_input(INPUT_POST, 'place');
 
-    $sql = 'UPDATE Concert SET title=:title, date=:date, place=:place WHERE concert_id=:id';
+    $sql = 'UPDATE Concert SET title=:title, date=:date, place=:place WHERE Concert.id=:id';
     $stmt = $pdo->prepare($sql);
 
     $stmt->bindParam(':title', $title);
@@ -60,13 +60,10 @@ if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
     <title>演奏会情報編集 | Festoso</title>
 </head>
 <body>
-<!--ログインしてない場合-->
 <?php if ($state_login === false): ?>
     <?php header('Location:login.php'); ?>
-    <!--第三者のユーザが表示した場合-->
 <?php elseif ($login_user['id'] !== $element_original['user_id']): ?>
     403 Forbidden <br>
-    他のユーザの演奏会は編集できません…<br>
     <a href="index.php">トップページに戻る</a>
 <?php else: ?>
     <h1>
@@ -86,7 +83,6 @@ if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
             <input type="text" id="place" name="place" value="<?php echo $element_original['place'] ?>">
         </p>
         <input type="submit" value="登録">
-
     </form>
 <?php endif; ?>
 

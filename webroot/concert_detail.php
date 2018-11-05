@@ -14,7 +14,32 @@ session_start();
 $root = realpath($_SERVER["DOCUMENT_ROOT"]);
 require "$root/mission6/database.php";
 
-$login_user = $_SESSION['login_user'];
+function isHost($state_login, $login_user, $concert_info)
+{
+    if ($state_login === true and $login_user['id'] === $concert_info['user_id']) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+
+// DBから演奏会の画像を取得する関数
+function fetch_images(pdo $pdo, $concert_info)
+{
+    $sql = 'SELECT * FROM Picture WHERE concert_id=:concert_id';
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':concert_id', $concert_info['id'], PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $stmt->fetchAll();
+}
+
+$state_login = false;
+if (isset($_SESSION['login_user'])) {
+    $login_user = $_SESSION['login_user'];
+    $state_login = true;
+}
 
 // GETメソッドのクエリから、表示したい演奏会のIDを取得
 if (isset($_GET['id'])) {
@@ -24,7 +49,7 @@ if (isset($_GET['id'])) {
 
     // 指定されたidの演奏会が存在するかどうかを調べる
     $stmt = $pdo->prepare(
-        'SELECT COUNT(*) AS num_of_concert FROM Concert WHERE concert_id=:id'
+        'SELECT COUNT(*) AS num_of_concert FROM Concert WHERE Concert.id=:id'
     );
     $stmt->bindParam(':id', $object_concert_id);
     $stmt->execute();
@@ -34,7 +59,7 @@ if (isset($_GET['id'])) {
     if ($result['num_of_concert'] > 0) {
         // 指定された演奏会idの演奏会情報情報を取得
         $stmt = $pdo->prepare(
-            'SELECT * FROM Concert WHERE concert_id=?'
+            'SELECT * FROM Concert WHERE Concert.id=?'
         );
         $params[] = $object_concert_id;
         $stmt->execute($params);
@@ -50,6 +75,7 @@ if (isset($_GET['id'])) {
 
         $group_info = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        $images = fetch_images($pdo, $concert_info);
     }
 }
 ?>
@@ -62,23 +88,57 @@ if (isset($_GET['id'])) {
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>演奏会詳細</title>
+
+    <style type="text/css">
+        img {
+            width: 320px;
+            height: auto;
+        }
+    </style>
 </head>
 <body>
 <?php if ($result["num_of_concert"] > 0): ?>
     <h2>演奏会詳細</h2>
-    演奏会名 <?php echo $concert_info['title'] ?> <br>
-    主催者 <?php echo $group_info['group_name'] ?> <br>
-    日時 <?php echo $concert_info['date'] ?> <br>
-    場所 <?php echo $concert_info['place'] ?> <br>
 
-    <!--    ログインしているユーザが演奏会主催者ならば、編集リンクを表示-->
-    <?php if ($login_user['id'] === $concert_info['user_id']): ?>
-        <a href="edit_concert.php?id=<? echo $object_concert_id ?>">編集</a>
-    <? endif; ?>
+    <? foreach ($images as $image): ?>
+        <a href="<? echo $image['path'] ?>">
+            <img src="<? echo $image['path'] ?>" alt="<? echo $image['title'] ?>">
+        </a>
+    <? endforeach; ?>
+    <a href="submit_image.php?id=<? echo $concert_info['id'] ?>">画像追加</a>
+
+    <table>
+        <tr>
+            <td>演奏会名</td>
+            <td><?php echo $concert_info['title'] ?></td>
+        </tr>
+        <tr>
+            <td>主催者</td>
+            <td>
+                <a href="profile.php?id=<? echo $concert_info['user_id'] ?>">
+                    <? echo $group_info['group_name'] ?>
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <td>日時</td>
+            <td><?php echo $concert_info['date'] ?></td>
+        </tr>
+        <tr>
+            <td>場所</td>
+            <td><?php echo $concert_info['place'] ?></td>
+        </tr>
+    </table>
+
+    <?php if (isset($login_user)) : ?>
+        <?php if (isHost($state_login, $login_user, $concert_info)): ?>
+            <a href="edit_concert.php?id=<? echo $object_concert_id ?>">編集</a>
+        <? endif; ?>
+    <?php endif; ?>
+
 <?php else: ?>
     指定された演奏会は存在しません。<br>
     <a href="index.php">トップページに戻る</a>
 <?php endif; ?>
-
 </body>
 </html>

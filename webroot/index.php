@@ -7,12 +7,15 @@ require "$root/mission6/database.php";
 $login_user = $_SESSION['login_user'];
 
 $pdo = connect();
+
+// 最近追加された演奏会5件を表示
 $stmt_concert = $pdo->prepare(
-    'SELECT * FROM Concert ORDER BY concert_id DESC LIMIT 5'
+    'SELECT * FROM Concert ORDER BY Concert.id DESC LIMIT 5'
 );
 $stmt_concert->execute();
 $result_concert = $stmt_concert->fetchAll();
 
+// 最近追加された演奏会5件を表示
 $stmt = $pdo->prepare('SELECT title,title_hash FROM movie ORDER BY id DESC LIMIT 5');
 $stmt->execute();
 $result_movie = $stmt->fetchAll();
@@ -22,12 +25,12 @@ $result_movie = $stmt->fetchAll();
 <!DOCTYPE html>
 <html>
 <head>
-    <!--    <meta charset="utf-8" />-->
+    <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>トップページ</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" media="screen" href="main.css"/>
-    <script src="main.js"></script>
+    <!--    <link rel="stylesheet" type="text/css" media="screen" href="main.css"/>-->
+    <!--    <script src="main.js"></script>-->
 </head>
 <body>
 <h1>Festoso</h1>
@@ -43,7 +46,10 @@ $result_movie = $stmt->fetchAll();
 <h2>最近追加された演奏会</h2>
 <p>
     <?php foreach ($result_concert as $row): ?>
-        <?php echo $row['title']; ?> : <a href="concert_detail.php?id=<?php echo $row['concert_id']; ?>">concert_detail.php?id=<?php echo $row['concert_id']; ?></a>
+        <?php echo $row['title']; ?> :
+        <a href="concert_detail.php?id=<?php echo $row['id']; ?>">
+            concert_detail.php?id=<?php echo $row['id']; ?>
+        </a>
         <br>
     <?php endforeach; ?>
 </p>
@@ -56,8 +62,7 @@ $result_movie = $stmt->fetchAll();
     <?php endforeach; ?>
 </p>
 
-<a href="imageupload_test.php">画像投稿テストページ</a>
-<a href="imageview_test.php">画像表示テストページ</a>
+<a href="submit_image.php">画像投稿テストページ</a>
 
 </body>
 </html>
