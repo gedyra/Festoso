@@ -14,6 +14,30 @@ session_start();
 $root = realpath($_SERVER["DOCUMENT_ROOT"]);
 require "$root/mission6/database.php";
 
+// ログインユーザが演奏会主催者かどうかを判定
+function isHost($login_user, $concert_id)
+{
+
+    if (!isset($login_user['id'])) {
+        return false;
+    }
+
+    $pdo = connect();
+    $sql = 'SELECT COUNT(*) as cnt FROM Concert WHERE Concert.id = :concert_id AND Concert.user_id = :user_id';
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam('concert_id', $concert_id, PDO::PARAM_INT);
+    $stmt->bindParam(':user_id', $login_user['id'], PDO::PARAM_INT);
+    $stmt->execute();
+
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($result['cnt'] > 0) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 // 画像アップロードのための関数
 function upload()
 {
@@ -35,6 +59,7 @@ function upload()
             $success = false;
             break;
     }
+
     $tmp_name = $_FILES['image']['tmp_name'];
     $bname = basename($_FILES['image']['name']);
     $name = mb_convert_encoding($bname, "UTF-8", "AUTO");
@@ -44,7 +69,10 @@ function upload()
     return array('success' => $success, 'name' => $name, 'path' => $path, 'error' => $error);
 }
 
+
+$login_user = array();
 if (isset($_SESSION['login_user'])) {
+    $login_user = $_SESSION['login_user'];
     if (isset($_FILES['image'])) {
         $image_info = upload();
 
@@ -87,15 +115,24 @@ if (isset($_SESSION['login_user'])) {
         }
     </style>
 </head>
+
+
 <body>
-<? if (isset($image_info)): ?>
-    <? foreach ($image_info['error'] as $err): ?>
-        <p class="error"><? echo h($err) ?></p>
-    <? endforeach; ?>
+<? if (isHost($login_user, $_GET['concert_id'])): ?>
+    <h1>画像アップロード</h1>
+    <? if (isset($image_info)): ?>
+        <? foreach ($image_info['error'] as $err): ?>
+            <p class="error"><? echo h($err) ?></p>
+        <? endforeach; ?>
+    <? endif; ?>
+    <form action="" method="post" enctype="multipart/form-data">
+        <input type="file" id="image" name="image" accept="image/*">
+        <button type="submit">アップロード</button>
+    </form>
+<? elseif (!isset($login_user['id'])): ?>
+    <? header('Location:login.php'); ?>
+<? else: ?>
+    403 forbidden
 <? endif; ?>
-<form action="" method="post" enctype="multipart/form-data">
-    <input type="file" id="image" name="image" accept="image/*">
-    <button type="submit">アップロード</button>
-</form>
 </body>
 </html>

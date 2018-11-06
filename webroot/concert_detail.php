@@ -14,15 +14,19 @@ session_start();
 $root = realpath($_SERVER["DOCUMENT_ROOT"]);
 require "$root/mission6/database.php";
 
+// 編集権限があるかどうかを判定
 function isHost($state_login, $login_user, $concert_info)
 {
+    if (!isset($login_user['id'])) {
+        return false;
+    }
+
     if ($state_login === true and $login_user['id'] === $concert_info['user_id']) {
         return true;
     } else {
         return false;
     }
 }
-
 
 // DBから演奏会の画像を取得する関数
 function fetch_images(pdo $pdo, $concert_info)
@@ -35,7 +39,10 @@ function fetch_images(pdo $pdo, $concert_info)
     return $stmt->fetchAll();
 }
 
+
+// ログインしているかどうかを判定
 $state_login = false;
+$login_user = array();
 if (isset($_SESSION['login_user'])) {
     $login_user = $_SESSION['login_user'];
     $state_login = true;
@@ -105,7 +112,10 @@ if (isset($_GET['id'])) {
             <img src="<? echo $image['path'] ?>" alt="<? echo $image['title'] ?>">
         </a>
     <? endforeach; ?>
-    <a href="submit_image.php?id=<? echo $concert_info['id'] ?>">画像追加</a>
+
+    <? if (isHost($state_login, $login_user, $concert_info)): ?>
+        <a href="submit_image.php?concert_id=<? echo $concert_info['id'] ?>">画像追加</a>
+    <? endif; ?>
 
     <table>
         <tr>

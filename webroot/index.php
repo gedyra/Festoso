@@ -29,10 +29,15 @@ $result_movie = $stmt->fetchAll();
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>トップページ</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!--    <link rel="stylesheet" type="text/css" media="screen" href="main.css"/>-->
+    <link rel="stylesheet" type="text/css" media="screen" href="css/main.css"/>
     <!--    <script src="main.js"></script>-->
 </head>
 <body>
+
+<div id="header">
+    ヘッダーです
+</div>
+
 <h1>Festoso</h1>
 
 <?php if (isset($login_user)) : ?>
@@ -61,8 +66,6 @@ $result_movie = $stmt->fetchAll();
         <br>
     <?php endforeach; ?>
 </p>
-
-<a href="submit_image.php">画像投稿テストページ</a>
 
 </body>
 </html>
