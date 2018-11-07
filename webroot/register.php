@@ -42,7 +42,11 @@ if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
         $params[] = $user_name;
         //$params[] = password_hash($password, PASSWORD_DEFAULT);
         //$params[] = crypt($password, '$2a'.)
-        $params[] = $password;
+        $salt = mcrypt_create_iv(22, MCRYPT_DEV_URANDOM);
+        $salt = base64_encode($salt);
+        $salt = str_replace('+', '.', $salt);
+        $password_hash = crypt($password, '$2y$10$' . $salt . '$');
+        $params[] = $password_hash;
         $params[] = $group_name;
 
         // IDに重複がなければ登録

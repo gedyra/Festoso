@@ -25,18 +25,14 @@ $result_movie = $stmt->fetchAll();
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8"/>
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>トップページ</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" media="screen" href="css/main.css"/>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
     <!--    <script src="main.js"></script>-->
 </head>
 <body>
-
-<div id="header">
-    ヘッダーです
-</div>
 
 <h1>Festoso</h1>
 
@@ -60,12 +56,17 @@ $result_movie = $stmt->fetchAll();
 </p>
 
 <h2>最近追加された動画</h2>
-<p>
+<table>
     <?php foreach ($result_movie as $row): ?>
-        <?php echo $row['title']; ?> : <a href="import_media.php?target=<?php echo $row['title_hash']; ?>">閲覧</a>
-        <br>
+        <tr>
+            <td>
+                <?php echo $row['title']; ?>
+            </td>
+            <td>
+                <a href="import_media.php?target=<?php echo $row['title_hash']; ?>">閲覧</a>
+            </td>
+        </tr>
     <?php endforeach; ?>
-</p>
-
+</table>
 </body>
 </html>

@@ -37,8 +37,13 @@ if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
 //                header('Location:profile.php');
 //                return;
 //            }
+
+            $salt = mcrypt_create_iv(22, MCRYPT_DEV_URANDOM);
+            $salt = base64_encode($salt);
+            $salt = str_replace('+', '.', $salt);
+            $password_hash = crypt($password, '$2y$10$' . $salt . '$');
             $password_true = $row['password'];
-            if ($password_true === $password) {
+            if ($password_true === $password_hash) {
                 session_regenerate_id(true);
                 $_SESSION['login_user'] = $row;
                 $login_user = $_SESSION['login_user'];
