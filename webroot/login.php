@@ -38,10 +38,15 @@ if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
 //                return;
 //            }
 
+            // ハッシュの準備
             $salt = mcrypt_create_iv(22, MCRYPT_DEV_URANDOM);
             $salt = base64_encode($salt);
             $salt = str_replace('+', '.', $salt);
+
+            // 入力されたパスワードをハッシュ化
             $password_hash = crypt($password, '$2y$10$' . $salt . '$');
+
+            // DBから取得したパスワードのハッシュ値と、
             $password_true = $row['password'];
             if ($password_true === $password_hash) {
                 session_regenerate_id(true);

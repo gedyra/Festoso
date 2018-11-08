@@ -32,6 +32,29 @@ $result_movie = $stmt->fetchAll();
     <link rel="stylesheet" type="text/css" href="css/main.css">
     <!--    <script src="main.js"></script>-->
 </head>
+
+
+<header>
+    <div class="container">
+        <div class="header-left">
+            <form action="search.php" method="post">
+                <label for="search">団体名・演奏会を検索</label>
+                <input type="text" name="search" id="search">
+                <button type="submit" name="action" value="searchBtn">検索</button>
+            </form>
+        </div>
+        <div class="header-right">
+            <?php if (!isset($login_user)): ?>
+                <a class="register" href="register.php">新規登録</a>
+                <a class="login" href="login.php">ログイン</a>
+            <?php else: ?>
+                <a class="login" href="logout.php"
+                   onclick="return confirm('ログアウトします。よろしいですか？')">ログアウト</a>
+                <a class="register" href="profile.php?id=<? echo $login_user['id'] ?>">マイページ</a>
+            <?php endif; ?>
+        </div>
+    </div>
+</header>
 <body>
 
 <h1>Festoso</h1>
