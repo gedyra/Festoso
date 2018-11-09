@@ -29,20 +29,28 @@ if ($action === 'searchBtn') {
     $search_query = '%' . $search_query . '%';
 
     // 演奏会検索
-    $stmt = $pdo->prepare('SELECT * FROM Concert WHERE title LIKE :query');
+    $stmt = $pdo->prepare('SELECT COUNT(*) as cnt FROM Concert WHERE title LIKE :query');
     $stmt->bindParam(':query', $search_query, PDO::PARAM_STR);
-    $exists_concert = $stmt->execute();
+    $stmt->execute();
+    $num = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($num['cnt'] > 0) {
+        $stmt = $pdo->prepare('SELECT date, title, group_name FROM Concert INNER JOIN User ON Concert.user_id=User.id WHERE title LIKE :query');
+        $stmt->bindParam(':query', $search_query, PDO::PARAM_STR);
+        $stmt->execute();
+        $results_concert = $stmt->fetchAll();
+    }
 
-    $results_concert = $stmt->fetchAll();
+    $stmt = $pdo->prepare('SELECT COUNT(*) as cnt FROM User WHERE group_name LIKE :query');
+    $stmt->bindParam(':query', $search_query, PDO::PARAM_STR);
+    $stmt->execute();
+    $num = $stmt->fetch(PDO::FETCH_ASSOC);
+    if ($num['cnt'] > 0) {
+        $_stmt = $pdo->prepare('SELECT * FROM User WHERE group_name LIKE :query');
+        $_stmt->bindParam(':query', $search_query, PDO::PARAM_STR);
+        $_stmt->execute();
 
-    $_stmt = $pdo->prepare('SELECT * FROM User WHERE group_name LIKE :query');
-    $_stmt->bindParam(':query', $search_query, PDO::PARAM_STR);
-    $exists_user = $_stmt->execute();
-
-    $results_user = $_stmt->fetchAll();
-
-    var_dump($exists_user);
-    var_dump($results_user);
+        $results_user = $_stmt->fetchAll();
+    }
 }
 
 ?>
@@ -59,16 +67,18 @@ if ($action === 'searchBtn') {
 <body>
 
 <h3>演奏会の検索結果</h3>
-<? if ($exists_concert !== false): ?>
+<? if (isset($results_concert)): ?>
     <table>
         <tr>
             <th>日付</th>
             <th>タイトル</th>
+            <th>主催</th>
         </tr>
         <? foreach ($results_concert as $concert): ?>
             <tr>
                 <td><?php echo $concert['date'] ?></td>
                 <td><a href="concert_detail.php?id=<? echo $concert['id'] ?>"><?php echo $concert['title'] ?></a></td>
+                <td><?php echo $concert['group_name'] ?></td>
             </tr>
         <? endforeach; ?>
     </table>
@@ -77,7 +87,7 @@ if ($action === 'searchBtn') {
 <? endif; ?>
 
 <h3>団体の検索結果</h3>
-<? if ($exists_user !== false): ?>
+<? if (isset($results_user)): ?>
     <table>
         <tr>
             <th>拠点</th>
