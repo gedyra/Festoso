@@ -118,7 +118,7 @@ if (isset($_SESSION['login_user'])) {
 
 
 <body>
-<? if (isHost($login_user, $_GET['concert_id'])): ?>
+<? if (isset($_GET['concert_id']) and isHost($login_user, $_GET['concert_id'])): ?>
     <h1>画像アップロード</h1>
     <? if (isset($image_info)): ?>
         <? foreach ($image_info['error'] as $err): ?>

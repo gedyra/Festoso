@@ -29,14 +29,6 @@ if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
         $rows = $stmt->fetchAll();
 
         foreach ($rows as $row) {
-//            $password_hash = $row['password'];
-//
-//            if (password_verify($password, $password_hash)) {
-//                session_regenerate_id(true);
-//                $_SESSION['login_user'] = $row;
-//                header('Location:profile.php');
-//                return;
-//            }
 
             // ハッシュの準備
             $salt = mcrypt_create_iv(22, MCRYPT_DEV_URANDOM);
@@ -60,7 +52,6 @@ if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
     }
 }
 ?>
-
     <!DOCTYPE html>
     <html lang="ja">
     <head>

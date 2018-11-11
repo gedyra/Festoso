@@ -12,7 +12,7 @@ error_reporting(E_ALL);
 session_start();
 
 $root = realpath($_SERVER["DOCUMENT_ROOT"]);
-require "$root/mission6/database.php";
+require "../database.php";
 
 $state_login = false;
 
@@ -23,41 +23,68 @@ if (isset($_SESSION['login_user'])) {
 
 $pdo = connect();
 
-try {
+function upload_movie()
+{
+    $success = false;
+    $error = array();
     if (isset($_FILES['movie']['error']) && is_int($_FILES['movie']['error'])) {
         switch ($_FILES['movie']['error']) {
             case UPLOAD_ERR_OK:
+                $tmp_name = $_FILES['movie']['tmp_name'];
+                $basename = basename($_FILES['image']['name']);
+                $name = mb_convert_encoding($basename, 'UTF-8', 'AUTO');
+                $path = "../movies/$name";
+                move_uploaded_file($tmp_name, $path);
+
+                return array('success' => true, 'name' => $name, 'path' => $path, 'error' => $error);
                 break;
             case UPLOAD_ERR_NO_FILE:
-                throw new RuntimeException('ファイルが選択されていません', 400);
+                $err['nofile'] = 'ファイルが選択されていません';
+                break;
             case UPLOAD_ERR_INI_SIZE:
-                throw new RuntimeException('ファイルサイズが大きすぎます', 400);
+                $err['toobig'] = 'ファイルサイズが大きすぎます';
+                break;
             default:
-                throw new RuntimeException('その他のエラーが発生しました', 500);
+                $err['other'] = 'その他のエラーが発生しました';
+                break;
         }
-
-        // 画像・動画をバイナリデータにする
-        $row_data = file_get_contents($_FILES['upfile']['tmp_name']);
-
-        // DBに格納するファイルネーム設定
-        // サーバ側の一時的なファイルネームと取得時刻を結合した文字列にsha256をかける
-
-        $date = getdate();
-        $fname = $_FILES['upfile']['tmp_name'] . $date['year'] . $date['mon'] . $date['mday'] . $date['hours'] . $date['minutes'] . $date['seconds'];
-        $fname_hash = hash("sha256", $fname);
-
-        $stmt = $pdo->prepare(
-            'INSERT INTO movie(id, title, title_hash, row_data, user_id) VALUES (null, ?, ?, ?, ?)'
-        );
-        $params[] = $fname;
-        $params[] = $fname_hash;
-        $params[] = $row_data;
-        $params[] = $login_user['id'];
-        $stmt->execute($params);
+        return array('success' => false, 'errors' => $err);
     }
-    header('Location:profile.php?id=' . $login_user['id']);
-} catch (PDOException $e) {
-    exit($e->getMessage());
+}
+
+$login_user = array();
+if (isset($_SESSION['login_user'])) {
+    $login_user = $_SESSION['login_user'];
+
+    if (isset($_FILES['movie'])) {
+
+        $movie_info = upload_movie();
+
+        if ($movie_info['success'] === false) {
+            foreach ($movie_info['errors'] as $e) {
+                echo $e . '<br>';
+            }
+        } else {
+
+            // DBに格納するファイルネーム設定
+            // サーバ側の一時的なファイルネームと取得時刻を結合した文字列にsha256をかける
+
+            $stmt = $pdo->prepare(
+                'INSERT INTO Movie(id, title, path, user_id)'
+                . 'VALUES (null, :title, :path, :user_id)'
+            );
+            $stmt->bindParam(':title', $movie_info['name']);
+            $stmt->bindParam(':path', $movie_info['path']);
+            $stmt->bindParam(':user_id', $login_user['id']);
+            $stmt->execute();
+
+            echo 'アップロードしました';
+
+            //header('Location:profile.php?id=' . $login_user['id'] . '&movie=true');
+        }
+    } else {
+        header('Location:login.php');
+    }
 }
 ?>
 
@@ -71,9 +98,12 @@ try {
     <title>動画アップロード</title>
 </head>
 <body>
-<?php if ($state_login !== false): ?>
+<?php if ($state_login === true): ?>
+    <?php foreach ($err as $e): ?>
+        <p class="error"><?php echo h($e) ?></p>
+    <?php endforeach; ?>
     <form action="submit_movie.php" enctype="multipart/form-data" method="post">
-        <input type="file" name="movie">
+        <input type="file" name="movie" accept="video/*">
         <input type="submit" value="アップロード">
     </form>
 <?php else: ?>

@@ -42,7 +42,7 @@ if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
 
     if (count($err) === 0) {
         $pdo = connect();
-        $stmt = $pdo->prepare('INSERT INTO `Concert` (`concert_id`, `user_id`, `concert_title`, `concert_cast`, `concert_place`, `concert_date`)'
+        $stmt = $pdo->prepare('INSERT INTO `Concert` (`id`, `user_id`, `title`, `cast`, `place`, `date`)'
             . ' VALUES (null, ?, ?, ?, ?, ?)');
 
         $params = array();

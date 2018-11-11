@@ -10,13 +10,13 @@ $pdo = connect();
 
 // 最近追加された演奏会5件を表示
 $stmt_concert = $pdo->prepare(
-    'SELECT * FROM Concert ORDER BY Concert.id DESC LIMIT 5'
+    'SELECT * FROM Concert ORDER BY Concert.id DESC LIMIT 10'
 );
 $stmt_concert->execute();
 $result_concert = $stmt_concert->fetchAll();
 
 // 最近追加された演奏会5件を表示
-$stmt = $pdo->prepare('SELECT title,title_hash FROM movie ORDER BY id DESC LIMIT 5');
+$stmt = $pdo->prepare('SELECT * FROM Movie ORDER BY id DESC LIMIT 10');
 $stmt->execute();
 $result_movie = $stmt->fetchAll();
 
@@ -86,7 +86,7 @@ $result_movie = $stmt->fetchAll();
                 <?php echo $row['title']; ?>
             </td>
             <td>
-                <a href="import_media.php?target=<?php echo $row['title_hash']; ?>">閲覧</a>
+                <a href="import_media.php?target=<?php echo $row['path']; ?>">閲覧</a>
             </td>
         </tr>
     <?php endforeach; ?>
