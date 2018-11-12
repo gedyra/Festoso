@@ -35,6 +35,8 @@ if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
     $concert_cast = filter_input(INPUT_POST, 'concert_cast');
     $concert_date = filter_input(INPUT_POST, 'concert_date');
     $concert_place = filter_input(INPUT_POST, 'concert_place');
+    $concert_program = filter_input(INPUT_POST, 'program');
+    $freetext = filter_input(INPUT_POST, 'freetext');
 
     if ($concert_title === '') {
         $err['concert_title'] = '演奏会タイトルは入力必須です。';
@@ -42,21 +44,20 @@ if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
 
     if (count($err) === 0) {
         $pdo = connect();
-        $stmt = $pdo->prepare('INSERT INTO `Concert` (`id`, `user_id`, `title`, `cast`, `place`, `date`)'
-            . ' VALUES (null, ?, ?, ?, ?, ?)');
+        $stmt = $pdo->prepare('INSERT INTO `Concert` (`id`, `user_id`, `title`, `cast`, `place`, `date`, `program`, `freetext`)'
+            . ' VALUES (null, :user_id, :title, :cast, :place, :date, :program, :freetext)');
 
-        $params = array();
-        $params[] = $login_user['id'];
-        $params[] = $concert_title;
+        $stmt->bindParam(':user_id', $login_user['id']);
+        $stmt->bindParam(':title', $concert_title);
+        $stmt->bindParam(':cast', $concert_cast);
+        $stmt->bindParam(':place', $concert_place);
+        $stmt->bindParam(':date', $concert_date);
+        $stmt->bindParam(':program', $concert_program);
+        $stmt->bindParam(':freetext', $freetext);
 
-        $params[] = $concert_cast;
-        $params[] = $concert_place;
-        $params[] = $concert_date;
-
-        $success = $stmt->execute($params);
+        $success = $stmt->execute();
 
         $concert_id = $pdo->lastInsertId('concert_id');
-
 
         $stmt->bindParam(':user_id', $login_user['id']);
         $stmt->bindParam(':concert_id', $concert_id);
@@ -71,6 +72,7 @@ if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
     <title>演奏会登録</title>
 </head>
 <body>
@@ -78,9 +80,13 @@ if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
 <?php if (isset($success) && $success) : ?>
     <?php header('Location:concert_detail.php?id=' . $concert_id); ?>
 <?php else: ?>
+    <? foreach ($err as $e): ?>
+        <? echo $e ?>
+    <? endforeach; ?>
+    *がついているものは必須入力です
     <form action="" method="post" enctype="multipart/form-data">
         <p>
-            <label for="title">演奏会のタイトル</label>
+            <label for="title">演奏会のタイトル*</label>
             <input type="text" id="title" name="concert_title">
         </p>
         <p>
@@ -96,8 +102,12 @@ if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') === 'POST') {
             <input type="text" id="place" name="concert_place">
         </p>
         <p>
-            <label for="poster">画像</label><br>
-            <input type="file" id="poster" name="image" accept="image/*">
+            <label for="program">プログラム</label><br>
+            <textarea name="program" id="program" cols="30" rows="10" placeholder="プログラム"></textarea>
+        </p>
+        <p>
+            <label for="freetext">自由記入欄</label><br>
+            <textarea name="freetext" id="freetext" cols="30" rows="10" placeholder="演奏会の情報を自由に記入してください"></textarea>
         </p>
         <p>
             <button type="submit">新規登録</button>
