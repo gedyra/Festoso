@@ -31,11 +31,31 @@ $results_user = $stmt->fetch(PDO::FETCH_ASSOC);
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <title>プロフィールページ | FESTOSO</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" type="text/css" media="screen" href="main.css"/>
+        <link rel="stylesheet" type="text/css" media="screen" href="css/main.css"/>
         <script src="main.js"></script>
     </head>
     <body>
-
+    <header>
+        <div class="container">
+            <div class="header-left">
+                <form action="search.php" method="post">
+                    <label for="search">団体名・演奏会を検索</label>
+                    <input type="text" name="search" id="search">
+                    <button type="submit" name="action" value="searchBtn">検索</button>
+                </form>
+            </div>
+            <div class="header-right">
+                <?php if (!isset($login_user)): ?>
+                    <a class="register" href="register.php">新規登録</a>
+                    <a class="login" href="login.php">ログイン</a>
+                <?php else: ?>
+                    <a class="login" href="logout.php"
+                       onclick="return confirm('ログアウトします。よろしいですか？')">ログアウト</a>
+                    <a class="register" href="profile.php?id=<? echo $login_user['id'] ?>">マイページ</a>
+                <?php endif; ?>
+            </div>
+        </div>
+    </header>
     <h2>プロフィール</h2>
     <h3>基本情報</h3>
 
@@ -58,7 +78,7 @@ $results_user = $stmt->fetch(PDO::FETCH_ASSOC);
     $stmt->execute();
     $results_concert = $stmt->fetchAll();
 
-    $stmt = $pdo->prepare('SELECT title,title_hash  FROM movie WHERE user_id=:user_id');
+    $stmt = $pdo->prepare('SELECT * FROM Movie WHERE user_id=:user_id');
     $stmt->bindParam(':user_id', $target['id']);
     $stmt->execute();
     $results_movie = $stmt->fetchAll();
@@ -88,7 +108,6 @@ $results_user = $stmt->fetch(PDO::FETCH_ASSOC);
 
     <h3>投稿した動画</h3>
     <?php if (count($results_movie) > 0): ?>
-        <p>
         <table border="1">
             <tr>
                 <th>タイトル</th>
@@ -98,11 +117,11 @@ $results_user = $stmt->fetch(PDO::FETCH_ASSOC);
                 <tr>
                     <td><?php echo $row['title']; ?> </td>
                     <td>
-                        <a href="import_media.php?target=<?php echo $row['title_hash']; ?>">閲覧</a>
+                        <a href="import_media.php?target=<?php echo $row['path']; ?>">閲覧</a>
                     </td>
                 </tr>
             <?php endforeach; ?>
-        </table></p>
+        </table>
     <?php else: ?>
         動画はまだ登録されていません
     <?php endif; ?>

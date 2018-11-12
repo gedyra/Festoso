@@ -94,6 +94,7 @@ if (isset($_GET['id'])) {
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="css/main.css">
     <title>演奏会詳細</title>
 
     <style type="text/css">
@@ -103,6 +104,27 @@ if (isset($_GET['id'])) {
         }
     </style>
 </head>
+<header>
+    <div class="container">
+        <div class="header-left">
+            <form action="search.php" method="post">
+                <label for="search">団体名・演奏会を検索</label>
+                <input type="text" name="search" id="search">
+                <button type="submit" name="action" value="searchBtn">検索</button>
+            </form>
+        </div>
+        <div class="header-right">
+            <?php if (!isset($login_user)): ?>
+                <a class="register" href="register.php">新規登録</a>
+                <a class="login" href="login.php">ログイン</a>
+            <?php else: ?>
+                <a class="login" href="logout.php"
+                   onclick="return confirm('ログアウトします。よろしいですか？')">ログアウト</a>
+                <a class="register" href="profile.php?id=<? echo $login_user['id'] ?>">マイページ</a>
+            <?php endif; ?>
+        </div>
+    </div>
+</header>
 <body>
 <?php if ($result["num_of_concert"] > 0): ?>
     <h2>演奏会詳細</h2>
@@ -137,6 +159,14 @@ if (isset($_GET['id'])) {
         <tr>
             <td>場所</td>
             <td><?php echo $concert_info['place'] ?></td>
+        </tr>
+        <tr>
+            <td>プログラム</td>
+            <td><?php echo $concert_info['program'] ?></td>
+        </tr>
+        <tr>
+            <td>自由記述欄</td>
+            <td><?php echo $concert_info['freetext'] ?></td>
         </tr>
     </table>
 
